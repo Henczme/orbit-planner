@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#17201d" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Orbit Planner" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Orbit Planner</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icon.svg" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="主导航">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">O</div>
+          <div>
+            <h1>Orbit Planner</h1>
+            <p>行程、待办、训练</p>
+          </div>
+        </div>
+
+        <nav class="nav-tabs" aria-label="视图切换">
+          <button class="nav-tab active" data-view="dashboard" type="button">
+            <span aria-hidden="true">⌂</span>
+            总览
+          </button>
+          <button class="nav-tab" data-view="schedule" type="button">
+            <span aria-hidden="true">□</span>
+            行程
+          </button>
+          <button class="nav-tab" data-view="tasks" type="button">
+            <span aria-hidden="true">✓</span>
+            待办
+          </button>
+          <button class="nav-tab" data-view="fitness" type="button">
+            <span aria-hidden="true">◇</span>
+            健身
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <span id="todayLabel"></span>
+          <button class="ghost-button" id="resetDemo" type="button">重置示例</button>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">今天的节奏</p>
+            <h2 id="viewTitle">总览</h2>
+          </div>
+          <div class="topbar-actions">
+            <label class="date-picker">
+              <span>日期</span>
+              <input id="activeDate" type="date" />
+            </label>
+            <button class="primary-button" id="quickAdd" type="button">新增</button>
+          </div>
+        </header>
+
+        <section class="view active" id="dashboardView" aria-labelledby="viewTitle">
+          <div class="metric-grid">
+            <article class="metric accent-blue">
+              <p>今日行程</p>
+              <strong id="scheduleCount">0</strong>
+            </article>
+            <article class="metric accent-green">
+              <p>待办完成</p>
+              <strong id="taskProgress">0/0</strong>
+            </article>
+            <article class="metric accent-red">
+              <p>训练分钟</p>
+              <strong id="workoutMinutes">0</strong>
+            </article>
+            <article class="metric accent-gold">
+              <p>本周训练</p>
+              <strong id="weeklyWorkout">0 次</strong>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel">
+              <div class="panel-head">
+                <h3>时间线</h3>
+                <button class="icon-button" data-open-form="schedule" type="button" aria-label="新增行程">＋</button>
+              </div>
+              <div class="timeline" id="todayTimeline"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <h3>优先待办</h3>
+                <button class="icon-button" data-open-form="task" type="button" aria-label="新增待办">＋</button>
+              </div>
+              <div class="compact-list" id="priorityTasks"></div>
+            </section>
+
+            <section class="panel wide-panel">
+              <div class="panel-head">
+                <h3>训练安排</h3>
+                <button class="icon-button" data-open-form="workout" type="button" aria-label="新增训练">＋</button>
+              </div>
+              <div class="workout-strip" id="workoutStrip"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="scheduleView" aria-labelledby="viewTitle">
+          <div class="section-toolbar">
+            <h3>行程安排</h3>
+            <button class="secondary-button" data-open-form="schedule" type="button">添加行程</button>
+          </div>
+          <div class="item-list" id="scheduleList"></div>
+        </section>
+
+        <section class="view" id="tasksView" aria-labelledby="viewTitle">
+          <div class="section-toolbar">
+            <div>
+              <h3>待办事项</h3>
+              <p>按优先级和截止日期排序</p>
+            </div>
+            <button class="secondary-button" data-open-form="task" type="button">添加待办</button>
+          </div>
+          <div class="filter-row" role="group" aria-label="待办过滤">
+            <button class="filter-chip active" data-task-filter="all" type="button">全部</button>
+            <button class="filter-chip" data-task-filter="open" type="button">未完成</button>
+            <button class="filter-chip" data-task-filter="done" type="button">已完成</button>
+          </div>
+          <div class="item-list" id="taskList"></div>
+        </section>
+
+        <section class="view" id="fitnessView" aria-labelledby="viewTitle">
+          <div class="section-toolbar">
+            <div>
+              <h3>健身规划</h3>
+              <p>记录训练类型、时长和状态</p>
+            </div>
+            <button class="secondary-button" data-open-form="workout" type="button">添加训练</button>
+          </div>
+          <div class="fitness-layout">
+            <section class="panel">
+              <h3>本周目标</h3>
+              <div class="goal-block">
+                <div>
+                  <span id="weeklyGoalText">0/4 次</span>
+                  <p>建议每周 3 到 5 次，给恢复留空间。</p>
+                </div>
+                <div class="progress-ring" id="goalRing" aria-label="本周训练目标进度">0%</div>
+              </div>
+            </section>
+            <div class="item-list" id="workoutList"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog class="entry-dialog" id="entryDialog">
+      <form id="entryForm" method="dialog">
+        <div class="dialog-head">
+          <h3 id="dialogTitle">新增</h3>
+          <button class="icon-button" value="cancel" type="submit" aria-label="关闭">×</button>
+        </div>
+
+        <input id="entryType" type="hidden" />
+        <div class="form-grid">
+          <label>
+            <span>标题</span>
+            <input id="entryTitle" required maxlength="60" />
+          </label>
+          <label>
+            <span>日期</span>
+            <input id="entryDate" type="date" required />
+          </label>
+          <label class="schedule-only">
+            <span>开始时间</span>
+            <input id="entryTime" type="time" />
+          </label>
+          <label class="schedule-only workout-only">
+            <span>时长分钟</span>
+            <input id="entryDuration" type="number" min="5" max="360" step="5" />
+          </label>
+          <label class="task-only">
+            <span>优先级</span>
+            <select id="entryPriority">
+              <option value="high">高</option>
+              <option value="medium" selected>中</option>
+              <option value="low">低</option>
+            </select>
+          </label>
+          <label class="workout-only">
+            <span>训练类型</span>
+            <select id="entryWorkoutType">
+              <option value="力量">力量</option>
+              <option value="有氧">有氧</option>
+              <option value="拉伸">拉伸</option>
+              <option value="核心">核心</option>
+            </select>
+          </label>
+          <label class="full-span">
+            <span>备注</span>
+            <textarea id="entryNotes" rows="3" maxlength="160"></textarea>
+          </label>
+        </div>
+        <div class="dialog-actions">
+          <button class="ghost-button" value="cancel" type="submit">取消</button>
+          <button class="primary-button" id="saveEntry" value="default" type="submit">保存</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
