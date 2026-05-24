@@ -5,6 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type"
 };
 const languageKeys = ["zh", "en", "de"];
+const defaultDailyCharacterLimit = 15000;
 
 export default {
   async fetch(request, env) {
@@ -19,6 +20,8 @@ export default {
       if (text.length > 5000) return json({ error: "一次最多翻译 5000 个字符。" }, 400);
 
       const firstTarget = guessFirstTarget(text);
+      const estimatedCharacters = text.length * 2;
+      const usage = await checkDailyUsage(env, estimatedCharacters);
       const first = await translateText(env.GOOGLE_TRANSLATE_API_KEY, text, firstTarget);
       const sourceLanguage = normalizeLanguage(first.detectedSourceLanguage || guessLanguage(text));
       const targets = languageKeys.filter((lang) => lang !== sourceLanguage);
@@ -32,12 +35,25 @@ export default {
         translations[target] = (await translateText(env.GOOGLE_TRANSLATE_API_KEY, text, target)).translatedText;
       }));
 
-      return json({ sourceLanguage, translations });
+      return json({ sourceLanguage, translations, usage });
     } catch (error) {
       return json({ error: error.message || "Translation failed." }, 500);
     }
   }
 };
+
+async function checkDailyUsage(env, characters) {
+  const limit = Number(env.DAILY_CHARACTER_LIMIT || defaultDailyCharacterLimit);
+  if (!env.TRI_TRANSLATE_USAGE) return { used: 0, limit, counted: false };
+  const key = `usage:${new Date().toISOString().slice(0, 10)}`;
+  const used = Number(await env.TRI_TRANSLATE_USAGE.get(key)) || 0;
+  if (used + characters > limit) {
+    throw new Error(`今天的免费额度保护已触发：${used}/${limit} 字符。明天会自动恢复。`);
+  }
+  const nextUsed = used + characters;
+  await env.TRI_TRANSLATE_USAGE.put(key, String(nextUsed), { expirationTtl: 60 * 60 * 48 });
+  return { used: nextUsed, limit, counted: true };
+}
 
 async function translateText(apiKey, text, target) {
   const response = await fetch(`${googleTranslateUrl}?key=${encodeURIComponent(apiKey)}`, {

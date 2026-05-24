@@ -1,3 +1,10 @@
 name = "tri-translate"
 main = "worker.js"
 compatibility_date = "2026-05-24"
+
+[vars]
+DAILY_CHARACTER_LIMIT = "15000"
+
+[[kv_namespaces]]
+binding = "TRI_TRANSLATE_USAGE"
+id = "c358502675964622a5dd6d09f9c51d90"

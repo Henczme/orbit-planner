@@ -1,4 +1,5 @@
 const storageKey = "tri_translate_settings_v1";
+const defaultWorkerUrl = "https://tri-translate.hzyme1996.workers.dev";
 const languages = {
   zh: { code: "zh-CN", label: "中文", voice: "zh-CN", element: "resultZh" },
   en: { code: "en", label: "English", voice: "en-US", element: "resultEn" },
@@ -81,7 +82,7 @@ async function translateNow() {
     if (!response.ok) throw new Error(payload.error || "翻译失败。");
     if (requestId !== lastRequestId) return;
     renderResults(payload);
-    setStatus("已翻译。");
+    setStatus(payload.usage?.counted ? `已翻译。今日用量约 ${payload.usage.used}/${payload.usage.limit} 字符。` : "已翻译。");
   } catch (error) {
     setStatus(error.message || "翻译失败，请检查 Worker 地址。");
   } finally {
@@ -153,9 +154,9 @@ function setStatus(message) {
 
 function loadSettings() {
   try {
-    return JSON.parse(localStorage.getItem(storageKey)) || {};
+    return { workerUrl: defaultWorkerUrl, ...(JSON.parse(localStorage.getItem(storageKey)) || {}) };
   } catch {
-    return {};
+    return { workerUrl: defaultWorkerUrl };
   }
 }
 
