@@ -1,0 +1,16 @@
+{
+  "name": "TriTranslate",
+  "short_name": "Translate",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f1e8",
+  "theme_color": "#10241f",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

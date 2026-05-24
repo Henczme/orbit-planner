@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10241f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="TriTranslate" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>TriTranslate</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icon.svg" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">T</div>
+          <div>
+            <h1>TriTranslate</h1>
+            <p>中文 · English · Deutsch</p>
+          </div>
+        </div>
+        <button class="icon-button" id="settingsToggle" type="button" aria-label="设置">设置</button>
+      </header>
+
+      <section class="translator">
+        <div class="input-panel">
+          <div class="input-head">
+            <span id="detectedLabel">自动识别</span>
+            <button class="ghost-button" id="clearText" type="button">清空</button>
+          </div>
+          <textarea id="sourceText" placeholder="输入中文、English 或 Deutsch..." autofocus></textarea>
+          <div class="action-row">
+            <button class="primary-button" id="translateButton" type="button">翻译</button>
+            <button class="secondary-button" id="speakSource" type="button">朗读原文</button>
+          </div>
+          <p class="status" id="statusText">输入后点翻译，或停顿片刻自动翻译。</p>
+        </div>
+
+        <div class="result-grid" id="resultGrid">
+          <article class="result-card" data-lang-card="zh-CN">
+            <div class="card-head">
+              <span>中文</span>
+              <button type="button" data-speak="zh-CN">朗读</button>
+            </div>
+            <p id="resultZh">等待输入</p>
+          </article>
+          <article class="result-card" data-lang-card="en">
+            <div class="card-head">
+              <span>English</span>
+              <button type="button" data-speak="en-US">朗读</button>
+            </div>
+            <p id="resultEn">Waiting</p>
+          </article>
+          <article class="result-card" data-lang-card="de">
+            <div class="card-head">
+              <span>Deutsch</span>
+              <button type="button" data-speak="de-DE">朗读</button>
+            </div>
+            <p id="resultDe">Warten</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="settings-panel" id="settingsPanel" aria-label="设置">
+        <form id="settingsForm">
+          <div>
+            <h2>连接 Worker</h2>
+            <p>Google API Key 放在 Cloudflare Worker 里。这里填写 Worker 地址即可。</p>
+          </div>
+          <label>
+            <span>Worker URL</span>
+            <input id="workerUrl" placeholder="https://tri-translate.your-name.workers.dev" />
+          </label>
+          <button class="primary-button" type="submit">保存</button>
+        </form>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
