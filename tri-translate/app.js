@@ -154,7 +154,9 @@ function setStatus(message) {
 
 function loadSettings() {
   try {
-    return { workerUrl: defaultWorkerUrl, ...(JSON.parse(localStorage.getItem(storageKey)) || {}) };
+    const settings = { workerUrl: defaultWorkerUrl, ...(JSON.parse(localStorage.getItem(storageKey)) || {}) };
+    if (!settings.workerUrl || settings.workerUrl.includes("your-name.workers.dev")) settings.workerUrl = defaultWorkerUrl;
+    return settings;
   } catch {
     return { workerUrl: defaultWorkerUrl };
   }
